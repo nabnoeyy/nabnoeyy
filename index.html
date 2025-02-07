@@ -59,13 +59,12 @@
         }
 
         .flashcard-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 50px;
-}
-
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 50px;
+        }
 
         .flashcard {
             background-color: #ffffff;
@@ -180,7 +179,8 @@
     </div>
 
     <script>
-        let flashcards = [];
+        const adminName = "เนย"; // ชื่อที่สามารถลบการ์ดคำถามได้
+        let flashcards = JSON.parse(localStorage.getItem("flashcards")) || []; // โหลดข้อมูลจาก localStorage
 
         function addFlashcard() {
             const question = document.getElementById("questionInput").value.trim();
@@ -198,6 +198,7 @@
                 };
 
                 flashcards.push(flashcard);
+                saveFlashcards();
                 renderFlashcards();
 
                 document.getElementById("questionInput").value = "";
@@ -232,6 +233,7 @@
                     <div class="actions">
                         <button class="like" onclick="voteFlashcard(${index}, 'like')">👍 ${flashcard.likes}</button>
                         <button class="dislike" onclick="voteFlashcard(${index}, 'dislike')">👎 ${flashcard.dislikes}</button>
+                        ${flashcard.friend === adminName ? `<button class="delete" onclick="deleteFlashcard(${index})">❌ ลบคำถาม</button>` : ""}
                     </div>
                     <div class="liked-by">
                         <h5>คนที่กดไลค์:</h5>
@@ -257,6 +259,7 @@
 
             if (commentInput && commenterName) {
                 flashcards[index].comments.push({ text: commentInput, commenter: commenterName });
+                saveFlashcards();
                 renderFlashcards();
             } else {
                 alert("กรุณากรอกชื่อและคอมเมนต์");
@@ -277,9 +280,23 @@
                 } else {
                     alert("คุณได้โหวตไปแล้ว");
                 }
+                saveFlashcards();
                 renderFlashcards();
             }
         }
+
+        function deleteFlashcard(index) {
+            flashcards.splice(index, 1);
+            saveFlashcards();
+            renderFlashcards();
+        }
+
+        function saveFlashcards() {
+            localStorage.setItem("flashcards", JSON.stringify(flashcards));
+        }
+
+        // เมื่อโหลดหน้าเว็บ ให้แสดงการ์ดที่มีอยู่แล้ว
+        renderFlashcards();
     </script>
 
 </body>
