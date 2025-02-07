@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบการ์ดคำถาม/คำตอบ</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #f2a6af, #f6f99b);
+            margin: 0;
+            padding: 0;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 50px;
+            font-size: 36px;
+            color: #fff;
+        }
+
+        .flashcard-form {
+            margin: 30px 0;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            margin: 10px;
+            width: 80%;
+            max-width: 600px;
+            font-size: 16px;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            background-color: #ffffff50;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #2575fc;
+            background-color: #fff;
+        }
+
+        button {
+            padding: 12px 25px;
+            background-color: #61b7c5;
+            color: white;
+            border: none;
+            font-size: 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .flashcard-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 50px;
+}
+
+
+        .flashcard {
+            background-color: #ffffff;
+            width: 80%;
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            color: #333;
+            font-size: 18px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .flashcard:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .question {
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .answer {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .comment {
+            margin-top: 20px;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            color: #333;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .like, .dislike {
+            padding: 10px 20px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .dislike {
+            background-color: #f44336;
+        }
+
+        .like:hover {
+            background-color: #1976d2;
+        }
+
+        .dislike:hover {
+            background-color: #d32f2f;
+        }
+
+        .friend-name {
+            font-size: 14px;
+            color: #777;
+            margin-top: 5px;
+        }
+
+        .liked-by {
+            margin-top: 15px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .liked-by ul {
+            padding-left: 0;
+            list-style-type: none;
+        }
+
+        .liked-by li {
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .flashcard {
+                width: 90%;
+            }
+
+            input[type="text"] {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ระบบการ์ดคำถาม/คำตอบ</h1>
+
+    <div class="flashcard-form">
+        <input type="text" id="questionInput" placeholder="คำถาม...">
+        <input type="text" id="friendNameInput" placeholder="ชื่อเพื่อน (ถ้ามี)" />
+        <button onclick="addFlashcard()">➕ เพิ่มการ์ดคำถาม</button>
+    </div>
+
+    <div class="flashcard-container" id="flashcardContainer">
+        <!-- การ์ดคำถาม/คำตอบจะถูกเพิ่มที่นี่ -->
+    </div>
+
+    <script>
+        let flashcards = [];
+
+        function addFlashcard() {
+            const question = document.getElementById("questionInput").value.trim();
+            const friendName = document.getElementById("friendNameInput").value.trim();
+
+            if (question) {
+                const flashcard = {
+                    question: question,
+                    friend: friendName || "ไม่ระบุชื่อเพื่อน",
+                    comments: [],
+                    likes: 0,
+                    dislikes: 0,
+                    likedBy: [],
+                    dislikedBy: []
+                };
+
+                flashcards.push(flashcard);
+                renderFlashcards();
+
+                document.getElementById("questionInput").value = "";
+                document.getElementById("friendNameInput").value = "";
+            } else {
+                alert("กรุณากรอกคำถาม");
+            }
+        }
+
+        function renderFlashcards() {
+            const container = document.getElementById("flashcardContainer");
+            container.innerHTML = "";
+
+            flashcards.forEach((flashcard, index) => {
+                const flashcardElement = document.createElement("div");
+                flashcardElement.classList.add("flashcard");
+
+                flashcardElement.innerHTML = `
+                    <div>
+                        <div class="question">${flashcard.question}</div>
+                        <div class="friend-name">คำถามจาก: ${flashcard.friend}</div>
+                        <div class="comment-section">
+                            <h4>คอมเมนต์</h4>
+                            <input type="text" id="commentInput-${index}" placeholder="เพิ่มคอมเมนต์..." style="width: 80%;" />
+                            <input type="text" id="commenterName-${index}" placeholder="ชื่อผู้คอมเมนต์" style="width: 80%; margin-top: 5px;" />
+                            <button onclick="addComment(${index})">โพสต์คอมเมนต์</button>
+                            <div id="commentDisplay-${index}">
+                                ${flashcard.comments.map(c => `<div class="comment">${c.text} - <strong>${c.commenter}</strong></div>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <button class="like" onclick="voteFlashcard(${index}, 'like')">👍 ${flashcard.likes}</button>
+                        <button class="dislike" onclick="voteFlashcard(${index}, 'dislike')">👎 ${flashcard.dislikes}</button>
+                    </div>
+                    <div class="liked-by">
+                        <h5>คนที่กดไลค์:</h5>
+                        <ul>
+                            ${flashcard.likedBy.map(user => `<li>${user}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="disliked-by">
+                        <h5>คนที่ไม่ชอบ:</h5>
+                        <ul>
+                            ${flashcard.dislikedBy.map(user => `<li>${user}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                container.appendChild(flashcardElement);
+            });
+        }
+
+        function addComment(index) {
+            const commentInput = document.getElementById(`commentInput-${index}`).value.trim();
+            const commenterName = document.getElementById(`commenterName-${index}`).value.trim();
+
+            if (commentInput && commenterName) {
+                flashcards[index].comments.push({ text: commentInput, commenter: commenterName });
+                renderFlashcards();
+            } else {
+                alert("กรุณากรอกชื่อและคอมเมนต์");
+            }
+        }
+
+        function voteFlashcard(index, type) {
+            const flashcard = flashcards[index];
+            const currentUser = prompt("กรุณากรอกชื่อของคุณ:");
+
+            if (currentUser) {
+                if (type === "like" && !flashcard.likedBy.includes(currentUser)) {
+                    flashcard.likes++;
+                    flashcard.likedBy.push(currentUser);
+                } else if (type === "dislike" && !flashcard.dislikedBy.includes(currentUser)) {
+                    flashcard.dislikes++;
+                    flashcard.dislikedBy.push(currentUser);
+                } else {
+                    alert("คุณได้โหวตไปแล้ว");
+                }
+                renderFlashcards();
+            }
+        }
+    </script>
+
+</body>
+</html>
