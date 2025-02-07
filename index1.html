@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการรายชื่อเพื่อน</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h2 {
+            color: #ff66b2;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin: 5px;
+            width: 250px;
+            border: 2px solid #ff66b2;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            cursor: pointer;
+            margin: 5px;
+            padding: 8px 15px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .edit {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .edit:hover {
+            background-color: #45a049;
+        }
+
+        .delete {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .delete:hover {
+            background-color: #e53935;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #ff66b2;
+            color: white;
+        }
+
+        td {
+            background-color: #fff;
+            color: #333;
+        }
+
+        td img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h2>📋 รายชื่อเพื่อนในคลาส</h2>
+
+    <input type="text" id="studentId" placeholder="รหัสนักศึกษา">
+    <input type="text" id="studentName" placeholder="ชื่อ-นามสกุล">
+    <input type="text" id="studentImageURL" placeholder="URL รูปภาพ">
+    <button onclick="addStudent()">➕ เพิ่มเพื่อน</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ลำดับที่</th>
+                <th>รหัสนักศึกษา</th>
+                <th>ชื่อ-นามสกุล</th>
+                <th>รูปภาพ</th>
+                <th>จัดการ</th>
+            </tr>
+        </thead>
+        <tbody id="studentTable"></tbody>
+    </table>
+
+    <script>
+        let students = [
+            { id: "664259005", name: "นางสาวณัฐกานต์ จำรัสภูมิ", image: "https://scontent-bkk1-2.xx.fbcdn.net/v/t39.30808-1/469070965_1810130263128825_46418201058875684_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=102&ccb=1-7&_nc_sid=e99d92&_nc_ohc=ZDZzjhwO1CgQ7kNvgFvKUDx&_nc_zt=24&_nc_ht=scontent-bkk1-2.xx&_nc_gid=ALG5Zaf9Dg60sOJ3mee06VA&oh=00_AYBIe5cwd6rXQMRDyK1iV0nd38ou--jAMRcyEZMU41OZjw&oe=67AB3A3A" },
+            { id: "664259006", name: "นางสาวณัฐ์สุดา รงทอง", image: "https://scontent-bkk1-1.xx.fbcdn.net/v/t39.30808-6/471986558_122126275586571500_7310908960470476110_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=08KKj5UTa94Q7kNvgEuaTk8&_nc_zt=23&_nc_ht=scontent-bkk1-1.xx&_nc_gid=A_fjrCB8Rnf8ogRaMOadY1K&oh=00_AYDCOYxgYSqJnIUgIAkU5z-yZGS32dNjJ7iwYySJxmpc6g&oe=67AB4F79" },
+            { id: "664259007", name: "นายธนกฤต จันทร์หลง", image: "https://scontent-bkk1-2.xx.fbcdn.net/v/t39.30808-1/264343905_3034178683466574_8104828155096074243_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=107&ccb=1-7&_nc_sid=e99d92&_nc_ohc=iG2lVVxjp2cQ7kNvgGmYQ0X&_nc_zt=24&_nc_ht=scontent-bkk1-2.xx&_nc_gid=A-kzDs1d5aBr4KCpDC5bGtT&oh=00_AYB0M3CDrIvGM3v90JZIVFArO1y04w9orJuhBmkLzxxBjQ&oe=67AB5D89" },
+            { id: "664259009", name: "นางสาวนับทอง สู่พิพักดิ์", image: "https://scontent-bkk1-1.xx.fbcdn.net/v/t39.30808-6/471757719_1659994828246516_4556105283823206561_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=bLqR-1Qwpr8Q7kNvgH16UEq&_nc_zt=23&_nc_ht=scontent-bkk1-1.xx&_nc_gid=A8uSCol5UMa_df1Bvc2yVrU&oh=00_AYBYb1aZe8grmBuxg5inzVvTLLQd39E2DMitvEl8CVG_Rw&oe=67AB3215" },
+            { id: "664259010", name: "นายนิติพล สมบัติ", image: "https://scontent-bkk1-1.xx.fbcdn.net/v/t39.30808-1/287627546_1382989458864235_9119002046005630767_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=111&ccb=1-7&_nc_sid=e99d92&_nc_ohc=JbdAi5GnAREQ7kNvgHnXr9q&_nc_zt=24&_nc_ht=scontent-bkk1-1.xx&_nc_gid=AQnX_yhDsoLVzvpz0PLEaBN&oh=00_AYDEN2ItG82cVb6Gfhza9i7Dp8b40GL56vmsZrqfveQPjg&oe=67AB5828" }
+        ];
+
+        function renderTable() {
+            const tableBody = document.getElementById("studentTable");
+            tableBody.innerHTML = "";
+
+            students.forEach((student, index) => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${index + 1}</td> 
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td><img src="${student.image}" alt="รูปภาพเพื่อน"></td>
+                    <td>
+                        <button class="edit" onclick="editStudent(${index})">✏️ แก้ไข</button>
+                        <button class="delete" onclick="deleteStudent(${index})">❌ ลบ</button>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function addStudent() {
+            const id = document.getElementById("studentId").value.trim();
+            const name = document.getElementById("studentName").value.trim();
+            const imageURL = document.getElementById("studentImageURL").value.trim();
+
+            if (id && name && imageURL) {
+                students.push({ id, name, image: imageURL });
+                renderTable();
+                document.getElementById("studentId").value = "";
+                document.getElementById("studentName").value = "";
+                document.getElementById("studentImageURL").value = "";
+            } else {
+                alert("กรุณากรอกข้อมูลให้ครบ!");
+            }
+        }
+
+        function deleteStudent(index) {
+            if (confirm("คุณต้องการลบเพื่อนคนนี้ใช่ไหม?")) {
+                students.splice(index, 1);
+                renderTable();
+            }
+        }
+
+        function editStudent(index) {
+            const newName = prompt("กรุณาแก้ไขชื่อ:", students[index].name);
+            if (newName) {
+                students[index].name = newName;
+                renderTable();
+            }
+        }
+
+        renderTable();
+    </script>
+
+</body>
+</html>
